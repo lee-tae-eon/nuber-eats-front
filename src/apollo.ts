@@ -2,7 +2,7 @@ import { ApolloClient, InMemoryCache, makeVar } from "@apollo/client";
 
 export const isLoggedInVar = makeVar(false);
 
-const client = new ApolloClient({
+export const client = new ApolloClient({
   uri: `http://localhost:3000/graphql`,
   cache: new InMemoryCache({
     typePolicies: {
@@ -18,5 +18,3 @@ const client = new ApolloClient({
     },
   }),
 });
-
-export default client;
