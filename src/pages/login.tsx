@@ -1,15 +1,15 @@
 import { gql, useMutation } from "@apollo/client";
-import React from "react";
 import { useForm } from "react-hook-form";
 import { FormError } from "../components/form-error";
+import nuberLogo from "../images/logo.svg";
 import {
-  PotatoMutation,
-  PotatoMutationVariables,
-} from "./mytypes.d.ts/PotatoMutation";
+  loginMutation,
+  loginMutationVariables,
+} from "../__generated__/loginMutation";
 
 const LOGIN_MUTATION = gql`
-  mutation PotatoMutation($email: String!, $password: String!) {
-    login(input: { email: $email, password: $password }) {
+  mutation loginMutation($loginInput: LoginInput!) {
+    login(input: $loginInput) {
       ok
       token
       error
@@ -29,28 +29,44 @@ export const Login = () => {
     formState: { errors },
     handleSubmit,
   } = useForm<ILoginForm>();
-  const [loginMutation, { loading, error, data }] = useMutation<
-    PotatoMutation,
-    PotatoMutationVariables
-  >(LOGIN_MUTATION);
+  const onCompleted = (data: loginMutation) => {
+    const {
+      login: { error, ok, token },
+    } = data;
+    if (ok) {
+      console.log(token);
+    }
+  };
+
+  const [loginMutation, { data: loginMutationResult, loading }] = useMutation<
+    loginMutation,
+    loginMutationVariables
+  >(LOGIN_MUTATION, {
+    onCompleted,
+  });
 
   const onSubmit = () => {
-    const { email, password } = getValues();
-    loginMutation({
-      variables: {
-        email,
-        password,
-      },
-    });
+    if (!loading) {
+      const { email, password } = getValues();
+      loginMutation({
+        variables: {
+          loginInput: {
+            email,
+            password,
+          },
+        },
+      });
+    }
   };
 
   return (
-    <div className="h-screen flex items-center justify-center bg-gray-800">
-      <div className="bg-white w-full max-w-lg py-10 rounded-lg text-center">
-        <h3 className="text-2xl text-gray-800">Log In</h3>
+    <div className="h-screen flex items-center flex-col mt-10 lg:mt-28">
+      <div className="w-full max-w-screen-sm flex flex-col px-5 items-center">
+        <img src={nuberLogo} alt="" className="w-52 mb-10" />
+        <h4 className="w-full font-medium text-left text-2xl">Welcome back</h4>
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="grid gap-4 mt-5 px-5"
+          className="grid gap-3 mt-5 w-full"
         >
           <input
             placeholder="Email"
@@ -68,7 +84,7 @@ export const Login = () => {
             type="password"
             {...register("password", {
               required: "Password is required",
-              minLength: 5,
+              minLength: 2,
             })}
           />
 
@@ -80,7 +96,10 @@ export const Login = () => {
               비밀번호는 5자 이상이어야 합니다.
             </span>
           )}
-          <button className="btn">Log In</button>
+          <button className="btn">{loading ? "Loading.." : "Log In"}</button>
+          {loginMutationResult?.login.error && (
+            <FormError errorMessage={loginMutationResult.login.error} />
+          )}
         </form>
       </div>
     </div>
