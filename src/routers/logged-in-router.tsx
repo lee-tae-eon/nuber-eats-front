@@ -1,5 +1,17 @@
+import { gql } from "@apollo/client";
 import React from "react";
 import { isLoggedInVar } from "../apollo";
+
+const ME_QUERY = gql`
+  query meQuery {
+    me {
+      id
+      email
+      role
+      verified
+    }
+  }
+`;
 
 export const LoggedInRouter = () => {
   const onClick = () => {

@@ -4,11 +4,13 @@ import { Link } from "react-router-dom";
 import { Button } from "../components/button";
 import { FormError } from "../components/form-error";
 import nuberLogo from "../images/logo.svg";
-import Helmet from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import {
   loginMutation,
   loginMutationVariables,
 } from "../__generated__/loginMutation";
+import { authTokenVar, isLoggedInVar } from "../apollo";
+import { LOCALSTORAGE_TOKEN } from "../constant";
 
 const LOGIN_MUTATION = gql`
   mutation loginMutation($loginInput: LoginInput!) {
@@ -38,8 +40,10 @@ export const Login = () => {
     const {
       login: { error, ok, token },
     } = data;
-    if (ok) {
-      console.log(token);
+    if (ok && token) {
+      localStorage.setItem(LOCALSTORAGE_TOKEN, token);
+      authTokenVar(token);
+      isLoggedInVar(true);
     }
   };
 
@@ -80,10 +84,17 @@ export const Login = () => {
             placeholder="Email"
             className="login--input"
             type="email"
-            {...register("email", { required: "Email is required" })}
+            {...register("email", {
+              required: "Email is required",
+              pattern:
+                /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+            })}
           />
           {errors.password?.message && (
             <FormError errorMessage={errors.email?.message} />
+          )}
+          {errors.password?.type === "pattern" && (
+            <FormError errorMessage={"Please enter a valid email"} />
           )}
 
           <input
