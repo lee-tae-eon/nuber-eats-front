@@ -40,10 +40,18 @@ export const Login = () => {
     const {
       login: { error, ok, token },
     } = data;
-    if (ok && token) {
-      localStorage.setItem(LOCALSTORAGE_TOKEN, token);
-      authTokenVar(token);
-      isLoggedInVar(true);
+    try {
+      if (error) {
+        console.log(error);
+        return;
+      }
+      if (ok && token) {
+        localStorage.setItem(LOCALSTORAGE_TOKEN, token);
+        authTokenVar(token);
+        isLoggedInVar(true);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 

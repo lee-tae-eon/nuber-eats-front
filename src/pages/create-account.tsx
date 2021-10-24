@@ -48,7 +48,7 @@ export const CreateAccount = () => {
 
     if (ok) {
       alert("계정이 생성 되었습니다. 로그인 하세요");
-      history.push("/login");
+      history.push("/");
     }
   };
 
@@ -152,7 +152,7 @@ export const CreateAccount = () => {
         </form>
         <div>
           Already have an account ?{" "}
-          <Link to="/login" className="text-lime-600 hover:underline">
+          <Link to="/" className="text-lime-600 hover:underline">
             Login Now
           </Link>
         </div>

@@ -20,7 +20,7 @@ const authLink = setContext((_, { headers }) => {
   return {
     headers: {
       ...headers,
-      "x-jwt": token || "",
+      "x-jwt": authTokenVar() || "",
     },
   };
 });
