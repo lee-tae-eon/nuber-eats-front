@@ -90,7 +90,7 @@ export const Login = () => {
         >
           <input
             placeholder="Email"
-            className="login--input"
+            className="input"
             type="email"
             {...register("email", {
               required: "Email is required",
@@ -107,7 +107,7 @@ export const Login = () => {
 
           <input
             placeholder="Password"
-            className="login--input"
+            className="input"
             type="password"
             {...register("password", {
               required: "Password is required",

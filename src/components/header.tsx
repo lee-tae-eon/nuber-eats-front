@@ -17,7 +17,7 @@ const Header = () => {
         <div className="w-full px-3 xl:px-0 max-w-screen-xl mx-auto flex justify-between items-center">
           <img src={nuberLogo} alt="Nuber Eats" className="w-24" />
           <span className="text-xs">
-            <Link to="/profile">
+            <Link to="/edit-profile">
               <FontAwesomeIcon icon={faUser} />
               {data?.me?.email}
             </Link>
