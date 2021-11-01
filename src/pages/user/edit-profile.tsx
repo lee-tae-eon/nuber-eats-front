@@ -1,6 +1,22 @@
+import { useApolloClient, useMutation } from "@apollo/client";
+import gql from "graphql-tag";
 import { useForm } from "react-hook-form";
 import { Button } from "../../components/button";
 import useMe from "../../hooks/useMe";
+
+import {
+  editProfile,
+  editProfileVariables,
+} from "../../__generated__/editProfile";
+
+const EDIT_PROFILE_MUTATION = gql`
+  mutation editProfile($input: EditProfileInput!) {
+    editProfile(input: $input) {
+      ok
+      error
+    }
+  }
+`;
 
 interface IFormProps {
   email?: string;
@@ -9,15 +25,62 @@ interface IFormProps {
 
 export const EditProfile = () => {
   const { data: userData } = useMe();
-  const { register, handleSubmit, getValues } = useForm<IFormProps>({
+  const client = useApolloClient();
+  const onCompleted = (data: editProfile) => {
+    const {
+      editProfile: { ok },
+    } = data;
+    if (ok && userData) {
+      const {
+        me: { email: prevEmail, id },
+      } = userData;
+      const { email: newEmail } = getValues();
+      if (prevEmail !== newEmail) {
+        client.writeFragment({
+          id: `User:${id}`,
+          fragment: gql`
+            fragment EditedUser on User {
+              verified
+              email
+            }
+          `,
+          data: {
+            email: newEmail,
+            verified: false,
+          },
+        });
+      }
+    }
+  };
+  const [editProfile, { loading }] = useMutation<
+    editProfile,
+    editProfileVariables
+  >(EDIT_PROFILE_MUTATION, {
+    onCompleted,
+  });
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    formState: { isValid },
+  } = useForm<IFormProps>({
     defaultValues: {
       email: userData?.me?.email,
       password: "",
     },
+    mode: "onChange",
   });
 
   const onSubmit = () => {
-    console.log(getValues());
+    const { email, password } = getValues();
+    editProfile({
+      variables: {
+        input: {
+          email,
+          ...(password !== "" && { password }),
+        },
+      },
+    });
   };
   return (
     <div className="mt-52 flex flex-col justify-center items-center">
@@ -27,7 +90,10 @@ export const EditProfile = () => {
         className="max-w-screen-sm grid max gap-3 mt-5 w-full mb-5"
       >
         <input
-          {...register("email")}
+          {...register("email", {
+            pattern:
+              /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+          })}
           className="input"
           type="email"
           placeholder="Email"
@@ -38,7 +104,11 @@ export const EditProfile = () => {
           type="password"
           placeholder="Password"
         />
-        <Button loading={false} canClick={true} actionText="save profile" />
+        <Button
+          loading={loading}
+          canClick={!loading}
+          actionText="save profile"
+        />
       </form>
     </div>
   );
