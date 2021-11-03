@@ -1,5 +1,6 @@
 import { gql, useApolloClient, useMutation } from "@apollo/client";
 import { useEffect } from "react";
+import { Helmet } from "react-helmet";
 import { useHistory, useLocation } from "react-router";
 import useMe from "../../hooks/useMe";
 import {
@@ -56,10 +57,13 @@ export const ConfirmEmail = () => {
         },
       },
     });
-  }, []);
+  }, [verifyEmail]);
 
   return (
     <div className="h-screen flex flex-col items-center justify-center mt-50">
+      <Helmet>
+        <title>Verify Email | Nuber Eats</title>
+      </Helmet>
       <h2 className="text-lg mb-2 font-medium">Confirming email...</h2>
       <h4 className="text-gray-700 text-sm">
         Please wait, dont't close this page....
