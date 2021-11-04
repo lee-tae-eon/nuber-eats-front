@@ -19,7 +19,7 @@ const RESTAURANTS_QUERY = gql`
       }
     }
     # todo: isPromoted 추가
-    restaurants(input: $input) {
+    restaurants(input: $Input) {
       ok
       error
       totalPages
@@ -38,7 +38,7 @@ const RESTAURANTS_QUERY = gql`
 `;
 
 const Restaurants = () => {
-  const { data, loading, error } = useQuery<
+  const { data, loading } = useQuery<
     restaurantsPageQuery,
     restaurantsPageQueryVariables
   >(RESTAURANTS_QUERY, {
@@ -51,7 +51,13 @@ const Restaurants = () => {
   if (!loading) {
     console.log(data);
   }
-  return <div>hello</div>;
+  return (
+    <div>
+      <div>
+        <input type="Search" placeholder="Search restaurants....." />
+      </div>
+    </div>
+  );
 };
 
 export default Restaurants;
